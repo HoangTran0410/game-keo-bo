@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game Kéo Bò</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        background-color: #87ceeb;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      h1 {
+        color: #2f4f4f;
+        margin-bottom: 10px;
+      }
+      .instructions {
+        background-color: white;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        max-width: 600px;
+        text-align: center;
+      }
+      #game-canvas {
+        border: 3px solid #2f4f4f;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🐄 Game Kéo Bò 🪢</h1>
+    <div class="instructions">
+      <p><strong>Hướng dẫn chơi:</strong></p>
+      <p>• Nhấn <kbd>ENTER</kbd> để thả dây thòng lọng</p>
+      <p>
+        • Khi trúng bò, nhấn liên tục <kbd>ENTER</kbd> để kéo bò về phía bạn
+      </p>
+      <p>• Cố gắng kéo được nhiều bò nhất có thể!</p>
+    </div>
+    <script src="game.js"></script>
+  </body>
+</html>
