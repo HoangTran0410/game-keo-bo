@@ -40,12 +40,14 @@ class PowerBar {
           } else {
             this.onLose();
           }
+          lastGameResultTime = millis();
           return;
         }
 
         // Check lose condition: power reached 0 before time runs out
         if (this.currentPower <= 10) {
           this.onLose();
+          lastGameResultTime = millis();
           return;
         }
       }

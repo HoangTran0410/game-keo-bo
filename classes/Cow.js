@@ -35,7 +35,7 @@ class Cow {
 
       if (this.x > width) {
         this.x = -this.size - random(100, 200);
-        this.y = getRandomY();
+        this.y = getRandomY(this.level);
         // reset state
         this.state = "running";
         this.speed = this.originalSpeed;
@@ -161,7 +161,7 @@ class Cow {
     this.state = "running";
     this.speed = this.originalSpeed;
     this.x = -this.size - random(100, 300);
-    this.y = getRandomY();
+    this.y = getRandomY(this.level);
     this.talkText = "";
     this.level = random([1, 2, 3]);
   }

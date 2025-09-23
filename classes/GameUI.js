@@ -45,7 +45,12 @@ function drawGameResult() {
   } else {
     fill(255, 150, 150);
   }
-  text("Bấm SPACE để chơi lại!", width / 2, boxY + boxHeight - 40);
+  const showEnter = millis() - lastGameResultTime > 3000;
+  text(
+    "Bấm SPACE" + (showEnter ? " / ENTER" : "") + " để chơi lại!",
+    width / 2,
+    boxY + boxHeight - 40
+  );
   if (gameResult.outcome === "success") {
     text("Bấm S để lưu kết quả!", width / 2, boxY + boxHeight - 20);
   }

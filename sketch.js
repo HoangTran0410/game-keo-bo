@@ -9,6 +9,7 @@ let backgroundImg;
 let handImg;
 let handPullImg;
 let enterImg;
+let lastGameResultTime = 0;
 
 const cowCount = 3;
 const cows = [];
@@ -155,8 +156,13 @@ function preload() {
   }
 }
 
-function getRandomY() {
-  return random(height / 2 - 60, height / 2 + 50);
+function getRandomY(level = 1) {
+  const range = [
+    [height / 2 - 60, height / 2 + 50],
+    [height / 2 - 60, height / 2 + 20],
+    [height / 2 - 60, height / 2 - 60],
+  ][level - 1];
+  return random(range[0], range[1]);
 }
 
 function setup() {
@@ -179,12 +185,14 @@ function setup() {
 
   let currentCowId = 0;
   for (let i = 0; i < 7; i++) {
+    const level = random([1, 2, 3]);
     cows.push(
       new Cow({
         img: cowImgs[currentCowId],
         pullImg: cowPullImgs[currentCowId],
         x: 50 + i * 150,
-        y: getRandomY(),
+        y: getRandomY(level),
+        level: level,
         speed: random(1, 3),
       })
     );
@@ -281,6 +289,11 @@ function keyPressed() {
         powerBar.startTimer(rope.attachedCow.level);
         rope.startPulling();
       }
+    } else if (
+      (gameState === "success" || gameState === "failed") &&
+      millis() - lastGameResultTime > 3000
+    ) {
+      restartGame();
     }
   }
 
