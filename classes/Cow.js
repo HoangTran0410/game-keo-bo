@@ -78,9 +78,35 @@ class Cow {
     // update talk
     this.talkDuration -= 1000 / frameRate();
     if (this.talkDuration <= 0) {
+      // bị kéo
       if (this.state == "pulling") {
         this.talk(TEXT_MESSAGES.random(TEXT_MESSAGES.being_pulled));
-      } else this.talkText = "";
+      }
+
+      // thành công / thất bại
+      else if (
+        (gameState === "success" || gameState === "failed") &&
+        random() < 0.005
+      ) {
+        this.talk(random(TEXT_MESSAGES.loser), 1000);
+      }
+
+      // bò khác đang bị kéo
+      else if (
+        this.state === "running" &&
+        gameState === "pulling" &&
+        random() < 0.0015
+      ) {
+        this.talk(random(TEXT_MESSAGES.cow_cheer), 2000);
+      }
+
+      // đang chờ ném
+      else if (this.state === "running" && random() < 0.002) {
+        this.talk(random(TEXT_MESSAGES.waiting_throw), 3000);
+      }
+
+      // reset
+      else this.talkText = "";
     }
   }
 
