@@ -27,7 +27,7 @@ class Cow {
       this.x += this.speed;
 
       if (this.x > width) {
-        this.x = -this.size;
+        this.x = -this.size - random(100, 200);
         this.y = getRandomY();
       }
     }
@@ -55,6 +55,15 @@ class Cow {
         this.talk(TEXT_MESSAGES.random(TEXT_MESSAGES.loser));
       } else this.talkText = "";
     }
+  }
+
+  isCollide(x, y, r) {
+    const realSize = this.size * getPerspectiveScale(this.y);
+    const realX = this.x + realSize / 2;
+    const realY = this.y + realSize / 2;
+    const realR = realSize / 2;
+
+    return dist(x, y, realX, realY) < realR + r;
   }
 
   draw() {
@@ -114,8 +123,8 @@ class Cow {
 
 const PERSPECTIVE_MIN_Y = 150; // Furthest point (smallest scale) - top of screen
 const PERSPECTIVE_MAX_Y = 400; // Closest point (largest scale) - bottom of screen
-const PERSPECTIVE_MIN_SCALE = 0.5; // Minimum scale factor (far away)
-const PERSPECTIVE_MAX_SCALE = 1.2; // Maximum scale factor (close up)
+const PERSPECTIVE_MIN_SCALE = 0.2; // Minimum scale factor (far away)
+const PERSPECTIVE_MAX_SCALE = 1.3; // Maximum scale factor (close up)
 
 function getPerspectiveScale(y) {
   // Clamp Y between min and max

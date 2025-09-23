@@ -2,6 +2,7 @@ let gameState = "running"; // running, pulling, success, failed
 
 let backgroundImg;
 
+const cowCount = 3;
 const cows = [];
 const cowImgs = [];
 const cowPullImgs = [];
@@ -27,14 +28,14 @@ const TEXT_MESSAGES = {
 function preload() {
   backgroundImg = loadImage(`assets/bg.png`);
   handImg = loadImage(`assets/hand.png`);
-  for (let i = 1; i < 3; i++) {
+  for (let i = 1; i < cowCount + 1; i++) {
     cowImgs.push(loadImage(`assets/cow${i}.png`));
     cowPullImgs.push(loadImage(`assets/cow${i}_pull.png`));
   }
 }
 
 function getRandomY() {
-  return random(height / 2 - 50, height / 2 + 50);
+  return random(height / 2 - 60, height / 2 + 50);
 }
 
 function setup() {
@@ -47,18 +48,22 @@ function setup() {
     y: height - 100,
     x: width / 2 - 75,
   });
-  for (let i = 0; i < 4; i++) {
-    const cowId = random([0, 1]);
+  let currentCowId = 0;
+  for (let i = 0; i < 7; i++) {
     cows.push(
       new Cow({
-        img: cowImgs[cowId],
-        pullImg: cowPullImgs[cowId],
+        img: cowImgs[currentCowId],
+        pullImg: cowPullImgs[currentCowId],
         x: 50 + i * 150,
         y: getRandomY(),
         speed: random(1, 3),
         level: random([1, 2, 3]),
       })
     );
+    currentCowId++;
+    if (currentCowId >= cowCount) {
+      currentCowId = 0;
+    }
   }
 }
 
