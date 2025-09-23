@@ -42,10 +42,15 @@ class PowerBar {
   onCowEscape() {
     // Find attached cow and make it escape
     if (rope && rope.attachedCow) {
-      rope.attachedCow.escape();
+      let cow = rope.attachedCow;
+      gameState = "failed";
+      gameResult.outcome = "failed";
+      gameResult.message = "💔 FAILED! 💔";
+      gameResult.detailMessage = `The Level ${cow.level} cow was too strong!\nYour power ran out. Try again! 💪`;
+      cow.talk("I'm too strong for you! 💪🐄", 5000);
+      cow.escape();
       rope.reset();
-      gameState = "running";
-      this.currentPower = 50; // Reset to center
+      this.isIncreasing = false;
     }
   }
 
