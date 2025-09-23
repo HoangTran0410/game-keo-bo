@@ -88,7 +88,12 @@ class Cow {
         (gameState === "success" || gameState === "failed") &&
         random() < 0.005
       ) {
-        this.talk(random(TEXT_MESSAGES.loser), 1000);
+        this.talk(
+          random(
+            gameState === "success" ? TEXT_MESSAGES.winner : TEXT_MESSAGES.loser
+          ),
+          1000
+        );
       }
 
       // bò khác đang bị kéo

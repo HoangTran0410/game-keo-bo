@@ -136,7 +136,9 @@ class Rope {
         // Rope hit a cow
         this.attachedCow = cow;
         cow.state = "pulling";
-        // cow.talk(random(TEXT_MESSAGES.being_pulled), 1000);
+        cows.forEach((c) => {
+          cow.talkDuration = 0; // reset talk
+        });
         this.isExtending = false;
 
         // Store cow's original position for resistance calculation

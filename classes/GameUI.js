@@ -200,6 +200,7 @@ function restartGame() {
 
   // Reset all cows to running state
   cows.forEach((cow) => {
+    cow.talkDuration = 0; // reset talk
     if (cow.state !== "running") {
       cow.resetPosition();
     }
