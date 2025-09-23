@@ -7,7 +7,6 @@ class PowerBar {
     this.maxPower = 100;
     this.currentPower = 50; // Start at center
     this.increasePerClick = 2; // Amount increased per Enter press (reduced for better balance)
-    this.baseDecreaseRate = 0.1; // Base decrease rate (will be multiplied by cow level)
     this.currentDecreaseRate = 0.5; // Current decrease rate based on cow level
 
     // Timer system
@@ -20,20 +19,32 @@ class PowerBar {
     // Only update power when a cow is actually caught
     if (gameState === "pulling" && rope && rope.attachedCow) {
       // Continuously decrease power based on cow level
-      this.currentPower = max(0, this.currentPower - this.currentDecreaseRate);
 
       // Update timer if active
       if (this.timerActive) {
+        this.currentPower = max(
+          0,
+          this.currentPower - this.currentDecreaseRate
+        );
         this.remainingTime -= 1000 / frameRate(); // Decrease by milliseconds
 
         // Check win condition: time reached 0 and power > 0
         if (this.remainingTime <= 0 && this.currentPower > 0) {
-          this.onWin();
+          const rand = random();
+          const id = rope.attachedCow.level - 1;
+          const percent = winPercentage[id];
+
+          console.log(rand, percent);
+          if (rand < percent && !reachLimit(rope.attachedCow.level)) {
+            this.onWin();
+          } else {
+            this.onLose();
+          }
           return;
         }
 
         // Check lose condition: power reached 0 before time runs out
-        if (this.currentPower <= 0) {
+        if (this.currentPower <= 10) {
           this.onLose();
           return;
         }
@@ -56,7 +67,7 @@ class PowerBar {
     this.remainingTime = this.maxTime;
     this.timerActive = true;
 
-    this.currentDecreaseRate = this.baseDecreaseRate * cowLevel;
+    this.currentDecreaseRate = decreaseSpeed[cowLevel - 1];
   }
 
   stopTimer() {
@@ -72,13 +83,15 @@ class PowerBar {
     // Player successfully held the cow for required time
     if (rope && rope.attachedCow) {
       let cow = rope.attachedCow;
+      lastWinCowLevel = cow.level;
       gameState = "success";
       gameResult.outcome = "success";
       gameResult.message = "🎉 THÀNH CÔNG! 🎉";
-      gameResult.detailMessage = `Bạn đã giữ được bò Level ${cow.level} trong ${
-        this.maxTime / 1000
-      } giây!\nTuyệt vời, cowboy! 🤠`;
-      cow.talk("You got me! Well done! 😊", 5000);
+      gameResult.detailMessage = `Bạn đã bắt được bò Level ${
+        cow.level
+      }!\n${random(TEXT_MESSAGES.winner)}`;
+      cow.talk(random(TEXT_MESSAGES.winner), 5000);
+      cow.resetPosition();
       rope.reset();
       this.stopTimer();
 
@@ -94,8 +107,10 @@ class PowerBar {
       gameState = "failed";
       gameResult.outcome = "failed";
       gameResult.message = "💔 THẤT BẠI! 💔";
-      gameResult.detailMessage = `Bò Level ${cow.level} quá mạnh!\nBạn không giữ được lực kéo đủ lâu 💪`;
-      cow.talk("Lêu lêu, sao bắt được tui 💪🐄", 5000);
+      gameResult.detailMessage = `Bò Level ${cow.level} quá mạnh!\n${random(
+        TEXT_MESSAGES.loser
+      )}`;
+      cow.talk(random(TEXT_MESSAGES.loser), 5000);
       cow.escape();
       rope.reset();
       this.stopTimer();
@@ -152,22 +167,22 @@ class PowerBar {
     text("POWER", this.x + this.width / 2, this.y - 20);
 
     // Timer display
-    if (this.timerActive) {
-      textSize(14);
-      let timeLeft = max(0, this.remainingTime / 1000);
-      let timeText = timeLeft.toFixed(1) + "s";
+    // if (this.timerActive) {
+    //   textSize(14);
+    //   let timeLeft = max(0, this.remainingTime / 1000);
+    //   let timeText = timeLeft.toFixed(1) + "s";
 
-      // Color based on remaining time
-      if (timeLeft > this.maxTime / 3000) {
-        fill(0, 255, 0); // Green - plenty of time
-      } else if (timeLeft > this.maxTime / 6000) {
-        fill(255, 255, 0); // Yellow - getting low
-      } else {
-        fill(255, 0, 0); // Red - critical
-      }
+    //   // Color based on remaining time
+    //   if (timeLeft > this.maxTime / 3000) {
+    //     fill(0, 255, 0); // Green - plenty of time
+    //   } else if (timeLeft > this.maxTime / 6000) {
+    //     fill(255, 255, 0); // Yellow - getting low
+    //   } else {
+    //     fill(255, 0, 0); // Red - critical
+    //   }
 
-      text(timeText, this.x + this.width / 2, this.y - 40);
-    }
+    //   text(timeText, this.x + this.width / 2, this.y - 40);
+    // }
 
     pop();
   }

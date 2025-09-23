@@ -6,7 +6,7 @@ class Cow {
     y = 100,
     size = 150,
     speed = 1,
-    level = 1,
+    level = random([1, 2, 3]),
   }) {
     this.img = img;
     this.pullImg = pullImg;
@@ -23,8 +23,10 @@ class Cow {
 
     // Escape animation properties
     this.originalSpeed = speed;
-    this.escapeSpeed = speed * 3;
+    this.escapeSpeed = 5;
     this.escapeDirection = 1; // 1 for right, -1 for left
+
+    this.flipped = false;
   }
 
   update() {
@@ -38,11 +40,17 @@ class Cow {
         this.state = "running";
         this.speed = this.originalSpeed;
       }
+
+      this.flipped = false;
     }
     if (this.state === "pulling") {
       // Cow is being managed by rope, only add slight struggle animation
       this.x += random(-0.5, 0.5) * this.level; // Slight visual struggle
       this.y += random(-0.3, 0.3) * this.level;
+
+      if (random() < 0.02) {
+        this.flipped = !this.flipped;
+      }
     }
     if (this.state === "escaping") {
       // Move quickly in escape direction
@@ -71,7 +79,7 @@ class Cow {
     this.talkDuration -= 1000 / frameRate();
     if (this.talkDuration <= 0) {
       if (this.state == "pulling") {
-        this.talk(TEXT_MESSAGES.random(TEXT_MESSAGES.loser));
+        this.talk(TEXT_MESSAGES.random(TEXT_MESSAGES.being_pulled));
       } else this.talkText = "";
     }
   }
@@ -95,6 +103,8 @@ class Cow {
     // wiggle effect
     rotate(sin((frameCount * this.speed) / 20) * Math.min(this.speed / 5, 0.3));
     const halfSize = realSize / 2;
+    if (this.flipped) scale(-1, 1);
+
     if (this.state === "running") {
       image(this.img, -halfSize, -halfSize, realSize, realSize * 0.8);
     } else if (this.state === "pulling") {
@@ -134,7 +144,7 @@ class Cow {
     pop();
   }
 
-  talk(text, duration = 2000) {
+  talk(text, duration = 1000) {
     this.talkText = text;
     this.talkDuration = duration;
   }
@@ -144,7 +154,7 @@ class Cow {
     this.speed = this.escapeSpeed;
     // Determine escape direction based on current position
     this.escapeDirection = this.x < width / 2 ? -1 : 1;
-    this.talk("I'm free! 🐄💨", 2000);
+    this.talk(random(TEXT_MESSAGES.loser), 2000);
   }
 
   resetPosition() {
@@ -153,5 +163,6 @@ class Cow {
     this.x = -this.size - random(100, 300);
     this.y = getRandomY();
     this.talkText = "";
+    this.level = random([1, 2, 3]);
   }
 }

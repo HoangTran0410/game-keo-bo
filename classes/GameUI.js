@@ -46,6 +46,38 @@ function drawGameResult() {
     fill(255, 150, 150);
   }
   text("Bấm SPACE để chơi lại!", width / 2, boxY + boxHeight - 40);
+  if (gameResult.outcome === "success") {
+    text("Bấm S để lưu kết quả!", width / 2, boxY + boxHeight - 20);
+  }
+
+  // drawSaveResult();
+
+  pop();
+}
+
+function drawSaveResult() {
+  const best5Result = winHistory.sort((a, b) => b.level - a.level).slice(0, 5);
+  if (!best5Result.length) return;
+
+  // draw list win history at bottom right corner
+  push();
+  fill(255, 255, 255, 200);
+  noStroke();
+  textAlign(RIGHT, BOTTOM);
+  textSize(16);
+
+  // draw list win history
+  let y = height - 20;
+  for (let i = 0; i < best5Result.length; i++) {
+    text(
+      best5Result[i].name + " - Level " + best5Result[i].level,
+      width - 20,
+      y
+    );
+    y -= 20;
+  }
+
+  text("Kết quả", width - 20, y);
 
   pop();
 }
@@ -57,11 +89,11 @@ function drawEnterButtonAnimation() {
   push();
 
   // Position beside power bar (to the right)
-  let animX = powerBar.x + powerBar.width + 40;
-  let animY = powerBar.y + powerBar.height - 40;
+  let animX = powerBar.x + powerBar.width + 60;
+  let animY = powerBar.y + powerBar.height - 60;
 
   // More intense animation to show rapid pressing is needed
-  let pulseTime = frameCount * 0.3; // Faster pulse
+  let pulseTime = frameCount * 0.1; // Faster pulse
   let bounceOffset = sin(pulseTime) * 12; // More bounce
   let alphaValue = map(sin(pulseTime * 3), -1, 1, 180, 255); // Faster flashing
 
@@ -79,7 +111,7 @@ function drawEnterButtonAnimation() {
   fill(255, 255, 0, alphaValue);
 
   // Multiple arrows with different phases
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 2; i++) {
     let arrowOffset = sin(pulseTime + i * 0.5) * 6;
     let arrowY = animY - 35 + i * 8 + arrowOffset;
 
@@ -98,19 +130,23 @@ function drawEnterButtonAnimation() {
   }
 
   // Draw red circle button with more intense pulsing
-  let buttonSize = 30 + sin(pulseTime * 2) * 8;
+  let buttonSize = 60 + sin(pulseTime * 2) * 8;
 
-  // Red circle with glow effect
-  noStroke();
-  fill(255, 0, 0, 120);
-  ellipse(animX, animY + 25, buttonSize + 15, buttonSize + 15); // Outer glow
+  // // Red circle with glow effect
+  // noStroke();
+  // fill(255, 0, 0, 120);
+  // ellipse(animX, animY + 25, buttonSize + 15, buttonSize + 15); // Outer glow
 
-  fill(255, 0, 0, alphaValue);
-  ellipse(animX, animY + 25, buttonSize, buttonSize); // Main button
+  // fill(255, 0, 0, alphaValue);
+  // ellipse(animX, animY + 25, buttonSize, buttonSize); // Main button
 
-  // Inner highlight
-  fill(255, 150, 150, alphaValue * 0.9);
-  ellipse(animX - 4, animY + 21, buttonSize * 0.5, buttonSize * 0.5);
+  // // Inner highlight
+  // fill(255, 150, 150, alphaValue * 0.9);
+  // ellipse(animX - 4, animY + 21, buttonSize * 0.5, buttonSize * 0.5);
+
+  translate(animX - buttonSize / 2, animY + 25 - buttonSize / 2);
+  rotate(sin(pulseTime * 2) * 0.1);
+  image(enterImg, 0, 0, buttonSize, buttonSize);
 
   pop();
 }
@@ -131,25 +167,11 @@ function drawInstructions() {
     text("Bấm ENTER để ném sợi dây và bắt bò!", width / 2, 30);
   } else if (gameState === "pulling") {
     textAlign(CENTER, CENTER);
-    textSize(14);
     if (rope.attachedCow) {
-      if (powerBar.timerActive) {
-        let cowLevel = rope.attachedCow.level;
-        let requiredSpeed = (1.5 + cowLevel * 0.5).toFixed(1); // 2, 2.5, 3 clicks/sec
-        text(
-          "Level " +
-            cowLevel +
-            " - Cần " +
-            requiredSpeed +
-            " lần/giây! Còn " +
-            (powerBar.remainingTime / 1000).toFixed(1) +
-            "s",
-          width / 2,
-          30
-        );
-      } else {
-        text("Bấm ENTER để bắt đầu kéo bò!", width / 2, 30);
-      }
+      let cowLevel = rope.attachedCow.level;
+      textSize(40);
+      fill("yellow");
+      text("Level " + cowLevel, width / 2, 30);
     }
   }
 

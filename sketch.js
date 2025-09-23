@@ -1,6 +1,6 @@
 let gameState = "running"; // running, pulling, success, failed
 let gameResult = {
-  outcome: "", // "success" or "failed"
+  outcome: "",
   message: "",
   detailMessage: "",
 };
@@ -8,11 +8,46 @@ let gameResult = {
 let backgroundImg;
 let handImg;
 let handPullImg;
+let enterImg;
 
 const cowCount = 3;
 const cows = [];
 const cowImgs = [];
 const cowPullImgs = [];
+let lastWinCowLevel = null;
+
+// based on cow level
+const winPercentage = [0.9, 0.7, 0.6];
+const winLimit = [70, 20, 10];
+const decreaseSpeed = [0.1, 0.2, 0.3];
+const winHistory = [
+  // {
+  //   name: 'user',
+  //   level: 1,
+  // }
+];
+
+function reachLimit(level) {
+  const count = winHistory.filter((_) => _.level == level && _.win).length;
+  return count >= winLimit[level - 1];
+}
+function loadHistory() {
+  const data = localStorage.getItem("gameKeyBo");
+  try {
+    if (data) {
+      const history = JSON.parse(data);
+      winHistory.push(...history);
+      console.log(winHistory);
+    } else {
+      console.log("No history found");
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+function saveHistory() {
+  localStorage.setItem("gameKeyBo", JSON.stringify(winHistory));
+}
 
 let hand;
 let rope;
@@ -26,11 +61,65 @@ const TEXT_MESSAGES = {
     return obj[floor(random(obj.length))];
   },
   loser: [
-    "Bye🤫🧏🏻‍♂️Bye🗿",
-    "🫵🏼🤣 Hahaha. Losser",
-    "🤡 oh no. Losser",
-    "😂🤣🤪😁",
-    "🤘🤏 No no",
+    "🐌 Chậm như rùa!",
+    "💨 Bò còn nhanh hơn bạn",
+    "🪦 Thua rồi kìa lêu lêu",
+    "😹 Ez game, noob",
+    "🧊 Đơ luôn kìa",
+    "🥴 Gà quá",
+    "🙃 Better luck next life",
+    "🎣 Bị kéo ngược rồi",
+    "🍌 Banana skill?",
+    "💤 Ngủ quên à?",
+    "🤣 Ôi trời ơi",
+    "🐂 Bò còn cười bạn",
+    "📉 Skill tụt dốc",
+    "🥱 Chán ghê",
+    "🤖 Bot mode on?",
+    "👶 Baby level",
+    "📴 Disconnect não?",
+    "🪫 Hết pin à?",
+  ],
+  winner: [
+    "🔥 Ez win!",
+    "👑 King of cow pulling",
+    "💪 Sức mạnh vô địch",
+    "🤣 Quá nhanh quá nguy hiểm",
+    "🚀 Tốc độ bàn thờ",
+    "🍗 Ăn gọn gàng",
+    "🐂 Bò cũng phải nể",
+    "⚡ Boom! Done",
+    "🥇 Top 1 server",
+    "🎯 Chuẩn không cần chỉnh",
+    "🥶 Đỉnh của chóp",
+    "🕺 Easy dance",
+    "🎮 Pro player mode",
+    "💯 Không trượt phát nào",
+    "🧨 Kéo phát nổ tung",
+    "🍀 Nhân phẩm max rank",
+    "😎 Trùm cuối thật sự",
+    "🏆 Cúp về tay ta",
+    "📈 Kéo lên đỉnh",
+  ],
+  being_pulled: [
+    "🫣 Ơ kìa, từ từ đã!",
+    "😵 Kéo nhẹ thôi chứ!",
+    "😂 Bò ơi cứu tao!",
+    "🤔 Hình như dây này fake?",
+    "🙃 Thôi xong...",
+    "🦴 Kéo gãy xương rồi 😭",
+    "🤡 Sao dây bên tui yếu vậy?",
+    "🪢 Trượt tay tí thôi mà...",
+    "🍌 Ai vứt vỏ chuối ở đây thế?",
+    "😹 Đừng kéo tóc tui chứ!",
+    "💨 Bayyy luôn rồi",
+    "🥴 Tạm biệt các bạn",
+    "📉 Skill tụt dốc không phanh",
+    "🥹 Tha cho tui phát này đi",
+    "🤣 Ôi trời, mất grip rồi",
+    "😵‍💫 Chóng mặt quá",
+    "💤 Kéo kiểu này thì ngủ luôn",
+    "🤲 Cho tui cơ hội làm lại",
   ],
 };
 
@@ -38,6 +127,7 @@ function preload() {
   backgroundImg = loadImage(`assets/bg.png`);
   handImg = loadImage(`assets/hand.png`);
   handPullImg = loadImage(`assets/hand_pull.png`);
+  enterImg = loadImage(`assets/enter.png`);
 
   for (let i = 1; i < cowCount + 1; i++) {
     cowImgs.push(loadImage(`assets/cow${i}.png`));
@@ -50,6 +140,8 @@ function getRandomY() {
 }
 
 function setup() {
+  loadHistory();
+
   createCanvas(800, 600);
 
   rope = new Rope();
@@ -73,7 +165,6 @@ function setup() {
         x: 50 + i * 150,
         y: getRandomY(),
         speed: random(1, 3),
-        level: random([1, 2, 3]),
       })
     );
     currentCowId++;
@@ -126,6 +217,8 @@ function draw() {
     particleSystem.update();
     particleSystem.draw();
   }
+
+  drawSaveResult();
 }
 
 function drawHand() {
@@ -155,7 +248,7 @@ function keyPressed() {
       // Throw rope vertically to center of screen from very bottom
       let handCenterX = hand.x + hand.w / 2;
       let ropeStartY = height - 10; // Very bottom of screen
-      rope.throw(handCenterX, ropeStartY, handCenterX, height / 2);
+      rope.throw(handCenterX, ropeStartY, handCenterX, height / 2 - 40);
       gameState = "pulling";
       // Don't start power management until cow is caught
     } else if (gameState === "pulling" && rope.attachedCow) {
@@ -168,6 +261,23 @@ function keyPressed() {
         rope.startPulling();
       }
     }
+  }
+
+  if (key === "s" && gameState === "success") {
+    // get user name
+    Swal.fire({
+      title: "Nhập tên của bạn",
+      input: "text",
+      confirmButtonText: "OK",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        winHistory.push({
+          name: result.value,
+          level: lastWinCowLevel,
+        });
+        saveHistory();
+      }
+    });
   }
 
   if (key === " " || keyCode === 32) {

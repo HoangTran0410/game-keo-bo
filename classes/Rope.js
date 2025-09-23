@@ -87,13 +87,6 @@ class Rope {
     if (!this.attachedCow) return;
 
     let cow = this.attachedCow;
-    let targetDistance = dist(
-      cow.x + cow.size / 2,
-      cow.y + cow.size / 2,
-      this.startX,
-      this.startY
-    );
-
     if (this.isPulling) {
       // Player is pulling - move cow towards rope start
       let dx = this.startX - (cow.x + cow.size / 2);
@@ -102,22 +95,24 @@ class Rope {
 
       if (distance > 50) {
         // Don't pull too close
-        let pullForce = this.pullSpeed * (powerBar.getPowerPercentage() * 2); // Power affects pull strength
+        let pullForce = this.pullSpeed * powerBar.getPowerPercentage(); // Power affects pull strength
         let angle = atan2(dy, dx);
         cow.x += cos(angle) * pullForce;
         cow.y += sin(angle) * pullForce;
         this.cowPullDistance += pullForce;
       }
-    } else {
-      // Cow resists and tries to pull back
-      if (this.cowPullDistance > 0) {
-        let dx = this.targetX - (cow.x + cow.size / 2);
-        let dy = this.targetY - (cow.y + cow.size / 2);
-        let resistForce = this.resistanceSpeed * cow.level; // Stronger cows resist more
-        let angle = atan2(dy, dx);
-        cow.x += cos(angle) * resistForce;
-        cow.y += sin(angle) * resistForce;
-        this.cowPullDistance = max(0, this.cowPullDistance - resistForce);
+
+      if (random() < 0.3) {
+        // Cow resists and tries to pull back
+        if (this.cowPullDistance > 0) {
+          let dx = this.targetX - (cow.x + cow.size / 2);
+          let dy = this.targetY - (cow.y + cow.size / 2);
+          let resistForce = this.resistanceSpeed * cow.level; // Stronger cows resist more
+          let angle = atan2(dy, dx);
+          cow.x += cos(angle) * resistForce;
+          cow.y += sin(angle) * resistForce;
+          this.cowPullDistance = max(0, this.cowPullDistance - resistForce);
+        }
       }
     }
 
@@ -132,7 +127,7 @@ class Rope {
         // Rope hit a cow
         this.attachedCow = cow;
         cow.state = "pulling";
-        cow.talk("Help! I'm being pulled! 😱", 3000);
+        // cow.talk(random(TEXT_MESSAGES.being_pulled), 1000);
         this.isExtending = false;
 
         // Store cow's original position for resistance calculation
@@ -186,7 +181,8 @@ class Rope {
     stroke(139, 69, 19);
     strokeWeight(2);
     noFill();
-    ellipse(this.endX, this.endY, 25, 25);
+    const r = (30 * this.endY) / (height / 2 + 100);
+    ellipse(this.endX, this.endY, r, r);
 
     pop();
   }
