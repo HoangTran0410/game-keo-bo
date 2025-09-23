@@ -1,13 +1,14 @@
 let gameState = "running"; // running, pulling, success, failed
 
 let backgroundImg;
+let handImg;
+let handPullImg;
 
 const cowCount = 3;
 const cows = [];
 const cowImgs = [];
 const cowPullImgs = [];
 
-let handImg;
 let hand;
 let rope;
 let powerBar;
@@ -30,6 +31,8 @@ const TEXT_MESSAGES = {
 function preload() {
   backgroundImg = loadImage(`assets/bg.png`);
   handImg = loadImage(`assets/hand.png`);
+  handPullImg = loadImage(`assets/hand_pull.png`);
+
   for (let i = 1; i < cowCount + 1; i++) {
     cowImgs.push(loadImage(`assets/cow${i}.png`));
     cowPullImgs.push(loadImage(`assets/cow${i}_pull.png`));
@@ -43,17 +46,16 @@ function getRandomY() {
 function setup() {
   createCanvas(800, 600);
 
-  hand = new Hand({
-    img: handImg,
+  rope = new Rope();
+  powerBar = new PowerBar();
+  powerBar.y = height - 250; // Set position after canvas is created
+
+  hand = {
     w: 120,
     h: 120,
     y: height - 100,
     x: width / 2 - 75,
-  });
-
-  rope = new Rope();
-  powerBar = new PowerBar();
-  powerBar.y = height - 250; // Set position after canvas is created
+  };
 
   let currentCowId = 0;
   for (let i = 0; i < 7; i++) {
@@ -92,8 +94,6 @@ function draw() {
   cows.forEach((cow) => cow.update());
   cows.forEach((cow) => cow.draw());
 
-  hand.draw();
-
   // Update and draw rope
   rope.update();
   rope.draw();
@@ -102,8 +102,32 @@ function draw() {
   powerBar.update();
   powerBar.draw();
 
+  // draw hand at bottom
+  drawHand();
+
   // Draw instructions
   drawInstructions();
+}
+
+function drawHand() {
+  if (gameState === "pulling") {
+    push();
+    translate(hand.x + hand.w / 2, hand.y + hand.h + 10);
+    rotate(sin(frameCount * 0.2) * 0.1);
+
+    image(handPullImg, -hand.w / 2, -hand.h, hand.w, hand.h);
+
+    pop();
+  } else {
+    push();
+    translate(hand.x + hand.w / 2, hand.y + hand.h);
+    // wiggle effect
+    rotate(sin(frameCount * 0.1) * 0.1);
+
+    image(handImg, -hand.w / 2, -hand.h, hand.w, hand.h);
+
+    pop();
+  }
 }
 
 function drawInstructions() {
