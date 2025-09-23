@@ -148,37 +148,44 @@ class Rope {
     if (!this.isActive) return;
 
     push();
-    stroke(139, 69, 19); // Brown color for rope
+
+    // Simple, visible rope curve
+    stroke(139, 69, 19); // Brown color
     strokeWeight(this.thickness);
     strokeCap(ROUND);
-
-    // Draw main rope line with slight sag
-    let distance = dist(this.startX, this.startY, this.endX, this.endY);
-    let sagAmount = min(distance, 100);
-
-    // Draw rope as curved line
     noFill();
+
+    // Calculate sag amount - make it very visible
+    let distance = dist(this.startX, this.startY, this.endX, this.endY);
+    let sagAmount = distance * 0.6; // Very pronounced sag
+
+    // Adjust sag based on rope state
+    if (this.attachedCow && this.isPulling) {
+      sagAmount *= 0.2; // Much tighter when pulling
+    } else if (this.attachedCow) {
+      sagAmount *= 0.5; // Medium sag when cow attached
+    }
+
+    // Calculate control points for clear, visible curve
+    let midX = (this.startX + this.endX) / 2;
+    let midY = (this.startY + this.endY) / 2;
+
+    // Draw rope as bezier curve with pronounced downward sag
     bezier(
       this.startX,
-      this.startY,
-      this.startX,
-      this.startY + sagAmount * 0.3,
+      this.startY, // Start point
+      midX,
+      midY + sagAmount, // Control point 1 - way down from midpoint
+      midX,
+      midY + sagAmount, // Control point 2 - same as control point 1
       this.endX,
-      this.endY - sagAmount * 0.3,
-      this.endX,
-      this.endY
+      this.endY // End point
     );
 
-    // Draw rope end lasso
-    // fill(139, 69, 19);
-    // stroke(101, 67, 33);
-    // strokeWeight(3);
-    // ellipse(this.endX, this.endY, 15, 15);
-
-    // Draw lasso opening
-    noFill();
+    // Draw simple lasso at the end
     stroke(139, 69, 19);
     strokeWeight(2);
+    noFill();
     ellipse(this.endX, this.endY, 25, 25);
 
     pop();
