@@ -19,10 +19,10 @@ function checkGameConditions() {
   if (distanceToHand < 100) {
     gameState = "success";
     gameResult.outcome = "success";
-    gameResult.message = "🎉 SUCCESS! 🎉";
-    gameResult.detailMessage = `You successfully pulled the Level ${cow.level} cow!\nGreat job, cowboy! 🤠`;
+    gameResult.message = "🎉 THÀNH CÔNG! 🎉";
+    gameResult.detailMessage = `Bạn đã kéo được bò Level ${cow.level}!\nTuyệt vời, cowboy! 🤠`;
     cow.talk("You got me! Well done! 😊", 5000);
-    rope.stopPulling();
+    rope.reset();
     powerBar.stopIncreasing();
 
     // Start success particle effect
@@ -35,10 +35,11 @@ function checkGameConditions() {
   if (powerBar.currentPower <= 0) {
     gameState = "failed";
     gameResult.outcome = "failed";
-    gameResult.message = "💔 FAILED! 💔";
-    gameResult.detailMessage = `The Level ${cow.level} cow was too strong!\nYour power ran out. Try again! 💪`;
-    cow.talk("I'm too strong for you! 💪🐄", 5000);
-    rope.stopPulling();
+    gameResult.message = "💔 THẤT BẠI! 💔";
+    gameResult.detailMessage = `Bò Level ${cow.level} quá mạnh!\nLực kéo của bạn đã hết 💪`;
+    cow.talk("Lêu lêu, sao bắt được tui 💪🐄", 5000);
+    cow.escape();
+    rope.reset();
     powerBar.stopIncreasing();
 
     // Start failure particle effect
@@ -50,10 +51,7 @@ function checkGameConditions() {
 function drawGameResult() {
   push();
 
-  // Semi-transparent overlay
-  fill(0, 0, 0, 180);
   noStroke();
-  rect(0, 0, width, height);
 
   // Main result box
   let boxWidth = 400;
@@ -65,9 +63,9 @@ function drawGameResult() {
   stroke(255);
   strokeWeight(4);
   if (gameResult.outcome === "success") {
-    fill(0, 100, 0, 220); // Dark green for success
+    fill(0, 100, 0, 150); // Dark green for success
   } else {
-    fill(100, 0, 0, 220); // Dark red for failure
+    fill(100, 0, 0, 150); // Dark red for failure
   }
   rect(boxX, boxY, boxWidth, boxHeight, 20);
 
@@ -95,7 +93,7 @@ function drawGameResult() {
   } else {
     fill(255, 150, 150);
   }
-  text("Press SPACE to try again!", width / 2, boxY + boxHeight - 40);
+  text("Bấm SPACE để chơi lại!", width / 2, boxY + boxHeight - 40);
 
   pop();
 }

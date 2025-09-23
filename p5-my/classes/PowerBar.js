@@ -7,9 +7,8 @@ class PowerBar {
     this.maxPower = 100;
     this.currentPower = 50; // Start at center
     this.increaseRate = 3;
-    this.decreaseRate = 1.5;
+    this.decreaseRate = 1;
     this.isIncreasing = false;
-    this.escapeThreshold = 0;
   }
 
   update() {
@@ -42,18 +41,14 @@ class PowerBar {
   onCowEscape() {
     // Find attached cow and make it escape
     if (rope && rope.attachedCow) {
-      let cow = rope.attachedCow;
-      gameState = "failed";
-      gameResult.outcome = "failed";
-      gameResult.message = "💔 FAILED! 💔";
-      gameResult.detailMessage = `The Level ${cow.level} cow was too strong!\nYour power ran out. Try again! 💪`;
-      cow.talk("I'm too strong for you! 💪🐄", 5000);
-      cow.escape();
-      rope.reset();
+      // gameState = "failed";
+      // gameResult.outcome = "failed";
+      // gameResult.message = "💔 THẤT BẠI! 💔";
+      // gameResult.detailMessage = `Bò Level ${cow.level} quá mạnh!\nLực kéo của bạn đã hết 💪`;
+      // cow.talk("Tui quá mạnh kkk! 💪🐄", 5000);
+      // cow.escape();
+      // rope.reset();
       this.isIncreasing = false;
-
-      // Start failure particle effect
-      particleSystem.start("failed");
     }
   }
 
