@@ -154,11 +154,7 @@ class Rope {
 
     // Draw main rope line with slight sag
     let distance = dist(this.startX, this.startY, this.endX, this.endY);
-    let sagAmount = min(distance * 0.1, 20);
-
-    // Calculate midpoint with sag
-    let midX = (this.startX + this.endX) / 2;
-    let midY = (this.startY + this.endY) / 2 + sagAmount;
+    let sagAmount = min(distance, 100);
 
     // Draw rope as curved line
     noFill();
@@ -174,10 +170,10 @@ class Rope {
     );
 
     // Draw rope end lasso
-    fill(139, 69, 19);
-    stroke(101, 67, 33);
-    strokeWeight(3);
-    ellipse(this.endX, this.endY, 15, 15);
+    // fill(139, 69, 19);
+    // stroke(101, 67, 33);
+    // strokeWeight(3);
+    // ellipse(this.endX, this.endY, 15, 15);
 
     // Draw lasso opening
     noFill();

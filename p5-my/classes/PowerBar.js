@@ -96,9 +96,9 @@ class PowerBar {
     text("POWER", this.x + this.width / 2, this.y - 20);
 
     // Instructions
-    textSize(10);
-    text("ENTER", this.x + this.width / 2, this.y + this.height + 15);
-    text("to pull", this.x + this.width / 2, this.y + this.height + 28);
+    // textSize(10);
+    // text("ENTER", this.x + this.width / 2, this.y + this.height + 15);
+    // text("to pull", this.x + this.width / 2, this.y + this.height + 28);
 
     pop();
   }
