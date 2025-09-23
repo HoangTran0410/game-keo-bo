@@ -9,6 +9,8 @@ const cowPullImgs = [];
 
 let handImg;
 let hand;
+let rope;
+let powerBar;
 
 const smokes = [];
 
@@ -48,6 +50,11 @@ function setup() {
     y: height - 100,
     x: width / 2 - 75,
   });
+
+  rope = new Rope();
+  powerBar = new PowerBar();
+  powerBar.y = height - 250; // Set position after canvas is created
+
   let currentCowId = 0;
   for (let i = 0; i < 7; i++) {
     cows.push(
@@ -86,4 +93,67 @@ function draw() {
   cows.forEach((cow) => cow.draw());
 
   hand.draw();
+
+  // Update and draw rope
+  rope.update();
+  rope.draw();
+
+  // Update and draw power bar
+  powerBar.update();
+  powerBar.draw();
+
+  // Draw instructions
+  drawInstructions();
+}
+
+function drawInstructions() {
+  push();
+  fill(255, 255, 255, 200);
+  noStroke();
+
+  if (gameState === "running") {
+    textAlign(CENTER, CENTER);
+    textSize(16);
+    text("Press ENTER to throw rope and catch a cow!", width / 2, 30);
+  } else if (gameState === "pulling") {
+    textAlign(CENTER, CENTER);
+    textSize(14);
+    if (rope.attachedCow) {
+      text(
+        "Hold ENTER to pull! Release to let cow resist. Don't let power reach zero!",
+        width / 2,
+        30
+      );
+    } else {
+      text("Rope thrown! Try to catch a cow!", width / 2, 30);
+    }
+  }
+
+  pop();
+}
+
+function keyPressed() {
+  if (key === "Enter" || keyCode === ENTER) {
+    if (gameState === "running" && !rope.isActive) {
+      // Throw rope vertically to center of screen from very bottom
+      let handCenterX = hand.x + hand.w / 2;
+      let ropeStartY = height - 10; // Very bottom of screen
+      rope.throw(handCenterX, ropeStartY, handCenterX, height / 2);
+      gameState = "pulling";
+      // Don't start power management until cow is caught
+    } else if (gameState === "pulling" && rope.attachedCow) {
+      // Start pulling cow - now power management begins
+      rope.startPulling();
+      powerBar.startIncreasing();
+    }
+  }
+}
+
+function keyReleased() {
+  if (key === "Enter" || keyCode === ENTER) {
+    if (gameState === "pulling" && rope.attachedCow) {
+      rope.stopPulling();
+      powerBar.stopIncreasing();
+    }
+  }
 }

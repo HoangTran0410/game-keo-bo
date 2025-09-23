@@ -16,10 +16,15 @@ class Cow {
     this.size = size;
     this.speed = speed;
     this.level = level;
-    this.state = "running"; // running, pulling, success, failed
+    this.state = "running"; // running, pulling, escaping, success, failed
 
     this.talkText = "";
     this.talkDuration = 0;
+
+    // Escape animation properties
+    this.originalSpeed = speed;
+    this.escapeSpeed = speed * 3;
+    this.escapeDirection = 1; // 1 for right, -1 for left
   }
 
   update() {
@@ -29,11 +34,25 @@ class Cow {
       if (this.x > width) {
         this.x = -this.size - random(100, 200);
         this.y = getRandomY();
+        // reset state
+        this.state = "running";
+        this.speed = this.originalSpeed;
       }
     }
     if (this.state === "pulling") {
-      this.x = mouseX;
-      this.y = mouseY;
+      // Cow is being managed by rope, only add slight struggle animation
+      this.x += random(-0.5, 0.5) * this.level; // Slight visual struggle
+      this.y += random(-0.3, 0.3) * this.level;
+    }
+    if (this.state === "escaping") {
+      // Move quickly in escape direction
+      this.x += this.escapeSpeed * this.escapeDirection;
+      this.y += random(-1, 1); // Slight random movement
+
+      // Remove cow when it goes off screen
+      if (this.x > width + 100 || this.x < -this.size - 100) {
+        this.resetPosition();
+      }
     }
 
     // add smoke
@@ -118,6 +137,22 @@ class Cow {
   talk(text, duration = 2000) {
     this.talkText = text;
     this.talkDuration = duration;
+  }
+
+  escape() {
+    this.state = "escaping";
+    this.speed = this.escapeSpeed;
+    // Determine escape direction based on current position
+    this.escapeDirection = this.x < width / 2 ? -1 : 1;
+    this.talk("I'm free! 🐄💨", 2000);
+  }
+
+  resetPosition() {
+    this.state = "running";
+    this.speed = this.originalSpeed;
+    this.x = -this.size - random(100, 300);
+    this.y = getRandomY();
+    this.talkText = "";
   }
 }
 
