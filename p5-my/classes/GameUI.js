@@ -170,18 +170,12 @@ function drawInstructions() {
   if (gameState === "running") {
     textAlign(CENTER, CENTER);
     textSize(16);
-    text("Press ENTER to throw rope and catch a cow!", width / 2, 30);
+    text("Bấm ENTER để ném sợi dây và bắt bò!", width / 2, 30);
   } else if (gameState === "pulling") {
     textAlign(CENTER, CENTER);
     textSize(14);
     if (rope.attachedCow) {
-      text(
-        "Hold ENTER to pull! Release to let cow resist. Pull the cow close to win!",
-        width / 2,
-        30
-      );
-    } else {
-      text("Rope thrown! Try to catch a cow!", width / 2, 30);
+      text("Bấm ENTER liên tục để kéo", width / 2, 30);
     }
   }
 
