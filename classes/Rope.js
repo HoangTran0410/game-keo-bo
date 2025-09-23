@@ -58,6 +58,15 @@ class Rope {
           this.isExtending = false;
           // Cow is caught, now player can pull
         }
+
+        // tất cả bò cười vào mặt bạn
+        // chọn 3 bò ngẫu nhiên
+        const selectedCows = cows.sort(() => Math.random() - 0.5).slice(0, 3);
+        selectedCows.forEach((cow) => {
+          if (random() < 0.3) {
+            cow.talk(random(TEXT_MESSAGES.throw_failed), 3000);
+          }
+        });
       }
     } else if (this.attachedCow) {
       // Handle cow pulling mechanics

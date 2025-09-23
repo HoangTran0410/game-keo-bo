@@ -19,7 +19,7 @@ let lastWinCowLevel = null;
 // based on cow level
 const winPercentage = [0.9, 0.7, 0.6];
 const winLimit = [70, 20, 10];
-const decreaseSpeed = [0.1, 0.2, 0.3];
+const decreaseSpeed = [0.2, 0.3, 0.5];
 const winHistory = [
   // {
   //   name: 'user',
@@ -116,10 +116,30 @@ const TEXT_MESSAGES = {
     "🥴 Tạm biệt các bạn",
     "📉 Skill tụt dốc không phanh",
     "🥹 Tha cho tui phát này đi",
-    "🤣 Ôi trời, mất grip rồi",
+    "🤣 Ôi trời, mất lực bám rồi",
+    "🤮 Gồng hết nổi huhu",
     "😵‍💫 Chóng mặt quá",
     "💤 Kéo kiểu này thì ngủ luôn",
     "🤲 Cho tui cơ hội làm lại",
+  ],
+  throw_failed: [
+    "🙃 Quăng cái gì vậy trời?",
+    "🤡 Ném mà trượt luôn!",
+    "🤣 Hụt rồi bạn ơi!",
+    "🥴 Tay run hả?",
+    "📉 Accuracy = 0%",
+    "🫠 Ném còn sai thì thôi",
+    "🤲 Ném như chưa từng ném",
+    "😵 Lệch hẳn một mét!",
+    "🙄 Chơi ném vòng sang nhà hàng xóm?",
+    "🪃 Boomerang còn quay lại, dây thì không",
+    "😏 Xem lại tầm mắt đi bạn",
+    "🐌 Chậm còn hơn cả bò",
+    "📦 Ship sai địa chỉ rồi",
+    "🎯 Mục tiêu còn ở xa lắm!",
+    "🕳️ Ném thẳng xuống hố à?",
+    "🫢 Tự hại chính mình luôn",
+    "🔥 Cú ném tệ nhất năm",
   ],
 };
 
@@ -142,7 +162,8 @@ function getRandomY() {
 function setup() {
   loadHistory();
 
-  createCanvas(800, 600);
+  const maxHeight = windowHeight - 50;
+  createCanvas(maxHeight * (4 / 3), maxHeight);
 
   rope = new Rope();
   powerBar = new PowerBar();
