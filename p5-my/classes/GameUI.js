@@ -1,53 +1,5 @@
 // Game UI and result display functions
 
-function checkGameConditions() {
-  if (!rope || !rope.attachedCow) return;
-
-  let cow = rope.attachedCow;
-  let cowCenterX = cow.x + cow.size / 2;
-  let cowCenterY = cow.y + cow.size / 2;
-
-  // Calculate distance from cow to hand position (success threshold)
-  let distanceToHand = dist(
-    cowCenterX,
-    cowCenterY,
-    hand.x + hand.w / 2,
-    hand.y + hand.h / 2
-  );
-
-  // Success condition: cow pulled close enough to hand (within 100 pixels)
-  if (distanceToHand < 100) {
-    gameState = "success";
-    gameResult.outcome = "success";
-    gameResult.message = "🎉 THÀNH CÔNG! 🎉";
-    gameResult.detailMessage = `Bạn đã kéo được bò Level ${cow.level}!\nTuyệt vời, cowboy! 🤠`;
-    cow.talk("You got me! Well done! 😊", 5000);
-    rope.reset();
-    powerBar.stopIncreasing();
-
-    // Start success particle effect
-    particleSystem.start("success");
-    return;
-  }
-
-  // Failure condition: power reached zero (already handled in PowerBar.onCowEscape)
-  // But we need to set game state to failed instead of returning to running
-  if (powerBar.currentPower <= 0) {
-    gameState = "failed";
-    gameResult.outcome = "failed";
-    gameResult.message = "💔 THẤT BẠI! 💔";
-    gameResult.detailMessage = `Bò Level ${cow.level} quá mạnh!\nLực kéo của bạn đã hết 💪`;
-    cow.talk("Lêu lêu, sao bắt được tui 💪🐄", 5000);
-    cow.escape();
-    rope.reset();
-    powerBar.stopIncreasing();
-
-    // Start failure particle effect
-    particleSystem.start("failed");
-    return;
-  }
-}
-
 function drawGameResult() {
   push();
 
@@ -108,51 +60,57 @@ function drawEnterButtonAnimation() {
   let animX = powerBar.x + powerBar.width + 40;
   let animY = powerBar.y + powerBar.height - 40;
 
-  // Animation timing
-  let pulseTime = frameCount * 0.15;
-  let bounceOffset = sin(pulseTime) * 8;
-  let alphaValue = map(sin(pulseTime * 2), -1, 1, 150, 255);
+  // More intense animation to show rapid pressing is needed
+  let pulseTime = frameCount * 0.3; // Faster pulse
+  let bounceOffset = sin(pulseTime) * 12; // More bounce
+  let alphaValue = map(sin(pulseTime * 3), -1, 1, 180, 255); // Faster flashing
+
+  textAlign(CENTER, CENTER);
+  textStyle(BOLD);
 
   // Draw "ENTER" text with pulsing effect
   fill(255, 255, 0, alphaValue);
-  noStroke();
-  textAlign(CENTER, CENTER);
-  textSize(14);
-  textStyle(BOLD);
-  text("ENTER", animX, animY - 60 + bounceOffset);
+  textSize(16);
+  text("ENTER", animX, animY - 55 + bounceOffset);
 
-  // Draw animated arrow pointing down
+  // Draw multiple animated arrows for rapid effect
   stroke(255, 255, 0, alphaValue);
-  strokeWeight(3);
+  strokeWeight(2);
   fill(255, 255, 0, alphaValue);
 
-  // Arrow shaft
-  line(animX, animY - 40 + bounceOffset, animX, animY - 10 + bounceOffset);
+  // Multiple arrows with different phases
+  for (let i = 0; i < 3; i++) {
+    let arrowOffset = sin(pulseTime + i * 0.5) * 6;
+    let arrowY = animY - 35 + i * 8 + arrowOffset;
 
-  // Arrow head (triangle pointing down)
-  triangle(
-    animX - 6,
-    animY - 15 + bounceOffset,
-    animX + 6,
-    animY - 15 + bounceOffset,
-    animX,
-    animY - 5 + bounceOffset
-  );
+    // Arrow shaft
+    line(animX, arrowY, animX, arrowY + 15);
 
-  // Draw red circle button with pulsing effect
-  let buttonSize = 25 + sin(pulseTime * 1.5) * 5;
+    // Arrow head
+    triangle(
+      animX - 4,
+      arrowY + 10,
+      animX + 4,
+      arrowY + 10,
+      animX,
+      arrowY + 15
+    );
+  }
+
+  // Draw red circle button with more intense pulsing
+  let buttonSize = 30 + sin(pulseTime * 2) * 8;
 
   // Red circle with glow effect
   noStroke();
-  fill(255, 0, 0, 100);
-  ellipse(animX, animY + 15, buttonSize + 10, buttonSize + 10); // Outer glow
+  fill(255, 0, 0, 120);
+  ellipse(animX, animY + 25, buttonSize + 15, buttonSize + 15); // Outer glow
 
   fill(255, 0, 0, alphaValue);
-  ellipse(animX, animY + 15, buttonSize, buttonSize); // Main button
+  ellipse(animX, animY + 25, buttonSize, buttonSize); // Main button
 
   // Inner highlight
-  fill(255, 100, 100, alphaValue * 0.8);
-  ellipse(animX - 3, animY + 12, buttonSize * 0.4, buttonSize * 0.4);
+  fill(255, 150, 150, alphaValue * 0.9);
+  ellipse(animX - 4, animY + 21, buttonSize * 0.5, buttonSize * 0.5);
 
   pop();
 }
@@ -175,7 +133,23 @@ function drawInstructions() {
     textAlign(CENTER, CENTER);
     textSize(14);
     if (rope.attachedCow) {
-      text("Bấm ENTER liên tục để kéo", width / 2, 30);
+      if (powerBar.timerActive) {
+        let cowLevel = rope.attachedCow.level;
+        let requiredSpeed = (1.5 + cowLevel * 0.5).toFixed(1); // 2, 2.5, 3 clicks/sec
+        text(
+          "Level " +
+            cowLevel +
+            " - Cần " +
+            requiredSpeed +
+            " lần/giây! Còn " +
+            (powerBar.remainingTime / 1000).toFixed(1) +
+            "s",
+          width / 2,
+          30
+        );
+      } else {
+        text("Bấm ENTER để bắt đầu kéo bò!", width / 2, 30);
+      }
     }
   }
 
@@ -194,7 +168,8 @@ function restartGame() {
 
   // Reset power bar
   powerBar.currentPower = 50;
-  powerBar.isIncreasing = false;
+  powerBar.currentDecreaseRate = powerBar.baseDecreaseRate;
+  powerBar.stopTimer();
 
   // Reset all cows to running state
   cows.forEach((cow) => {

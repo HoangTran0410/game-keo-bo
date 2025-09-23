@@ -86,11 +86,6 @@ function setup() {
 function draw() {
   background(backgroundImg);
 
-  // Check win/lose conditions during pulling state
-  if (gameState === "pulling") {
-    checkGameConditions();
-  }
-
   // sort cows by y
   cows.sort((a, b) => a.y - b.y);
 
@@ -164,9 +159,14 @@ function keyPressed() {
       gameState = "pulling";
       // Don't start power management until cow is caught
     } else if (gameState === "pulling" && rope.attachedCow) {
-      // Start pulling cow - now power management begins
-      rope.startPulling();
-      powerBar.startIncreasing();
+      // Each Enter press increases power (no holding)
+      powerBar.increasePower();
+
+      // Start timer and pulling animation on first power increase
+      if (!powerBar.timerActive) {
+        powerBar.startTimer(rope.attachedCow.level);
+        rope.startPulling();
+      }
     }
   }
 
@@ -174,15 +174,6 @@ function keyPressed() {
     // SPACE key
     if (gameState === "success" || gameState === "failed") {
       restartGame();
-    }
-  }
-}
-
-function keyReleased() {
-  if (key === "Enter" || keyCode === ENTER) {
-    if (gameState === "pulling" && rope.attachedCow) {
-      rope.stopPulling();
-      powerBar.stopIncreasing();
     }
   }
 }

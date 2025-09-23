@@ -6,49 +6,102 @@ class PowerBar {
     this.height = 200;
     this.maxPower = 100;
     this.currentPower = 50; // Start at center
-    this.increaseRate = 3;
-    this.decreaseRate = 1;
-    this.isIncreasing = false;
+    this.increasePerClick = 2; // Amount increased per Enter press (reduced for better balance)
+    this.baseDecreaseRate = 0.1; // Base decrease rate (will be multiplied by cow level)
+    this.currentDecreaseRate = 0.5; // Current decrease rate based on cow level
+
+    // Timer system
+    this.maxTime = 0; // Will be set based on cow level (level * 3 seconds)
+    this.remainingTime = 0;
+    this.timerActive = false;
   }
 
   update() {
     // Only update power when a cow is actually caught
     if (gameState === "pulling" && rope && rope.attachedCow) {
-      if (this.isIncreasing) {
-        this.currentPower = min(
-          this.maxPower,
-          this.currentPower + this.increaseRate
-        );
-      } else {
-        this.currentPower = max(0, this.currentPower - this.decreaseRate);
-      }
+      // Continuously decrease power based on cow level
+      this.currentPower = max(0, this.currentPower - this.currentDecreaseRate);
 
-      // Check if cow should escape
-      if (this.currentPower <= this.escapeThreshold) {
-        this.onCowEscape();
+      // Update timer if active
+      if (this.timerActive) {
+        this.remainingTime -= 1000 / frameRate(); // Decrease by milliseconds
+
+        // Check win condition: time reached 0 and power > 0
+        if (this.remainingTime <= 0 && this.currentPower > 0) {
+          this.onWin();
+          return;
+        }
+
+        // Check lose condition: power reached 0 before time runs out
+        if (this.currentPower <= 0) {
+          this.onLose();
+          return;
+        }
       }
     }
   }
 
-  startIncreasing() {
-    this.isIncreasing = true;
+  increasePower() {
+    // Called when Enter is pressed - single increase
+    if (gameState === "pulling" && rope && rope.attachedCow) {
+      this.currentPower = min(
+        this.maxPower,
+        this.currentPower + this.increasePerClick
+      );
+    }
   }
 
-  stopIncreasing() {
-    this.isIncreasing = false;
+  startTimer(cowLevel) {
+    this.maxTime = cowLevel * 3000; // 3 seconds per level in milliseconds
+    this.remainingTime = this.maxTime;
+    this.timerActive = true;
+
+    this.currentDecreaseRate = this.baseDecreaseRate * cowLevel;
   }
 
-  onCowEscape() {
-    // Find attached cow and make it escape
+  stopTimer() {
+    this.timerActive = false;
+    this.remainingTime = 0;
+    // Also stop rope pulling animation
+    if (rope) {
+      rope.stopPulling();
+    }
+  }
+
+  onWin() {
+    // Player successfully held the cow for required time
     if (rope && rope.attachedCow) {
-      // gameState = "failed";
-      // gameResult.outcome = "failed";
-      // gameResult.message = "💔 THẤT BẠI! 💔";
-      // gameResult.detailMessage = `Bò Level ${cow.level} quá mạnh!\nLực kéo của bạn đã hết 💪`;
-      // cow.talk("Tui quá mạnh kkk! 💪🐄", 5000);
-      // cow.escape();
-      // rope.reset();
-      this.isIncreasing = false;
+      let cow = rope.attachedCow;
+      gameState = "success";
+      gameResult.outcome = "success";
+      gameResult.message = "🎉 THÀNH CÔNG! 🎉";
+      gameResult.detailMessage = `Bạn đã giữ được bò Level ${cow.level} trong ${
+        this.maxTime / 1000
+      } giây!\nTuyệt vời, cowboy! 🤠`;
+      cow.talk("You got me! Well done! 😊", 5000);
+      rope.reset();
+      this.stopTimer();
+
+      // Start success particle effect
+      particleSystem.start("success");
+    }
+  }
+
+  onLose() {
+    // Player failed to maintain power
+    if (rope && rope.attachedCow) {
+      let cow = rope.attachedCow;
+      gameState = "failed";
+      gameResult.outcome = "failed";
+      gameResult.message = "💔 THẤT BẠI! 💔";
+      gameResult.detailMessage = `Bò Level ${cow.level} quá mạnh!\nBạn không giữ được lực kéo đủ lâu 💪`;
+      cow.talk("Lêu lêu, sao bắt được tui 💪🐄", 5000);
+      cow.escape();
+      rope.reset();
+      this.stopTimer();
+
+      // Start failure particle effect
+      particleSystem.start("failed");
     }
   }
 
@@ -98,10 +151,23 @@ class PowerBar {
     textSize(12);
     text("POWER", this.x + this.width / 2, this.y - 20);
 
-    // Instructions
-    // textSize(10);
-    // text("ENTER", this.x + this.width / 2, this.y + this.height + 15);
-    // text("to pull", this.x + this.width / 2, this.y + this.height + 28);
+    // Timer display
+    if (this.timerActive) {
+      textSize(14);
+      let timeLeft = max(0, this.remainingTime / 1000);
+      let timeText = timeLeft.toFixed(1) + "s";
+
+      // Color based on remaining time
+      if (timeLeft > this.maxTime / 3000) {
+        fill(0, 255, 0); // Green - plenty of time
+      } else if (timeLeft > this.maxTime / 6000) {
+        fill(255, 255, 0); // Yellow - getting low
+      } else {
+        fill(255, 0, 0); // Red - critical
+      }
+
+      text(timeText, this.x + this.width / 2, this.y - 40);
+    }
 
     pop();
   }
