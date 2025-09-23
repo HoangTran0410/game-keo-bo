@@ -24,6 +24,9 @@ function checkGameConditions() {
     cow.talk("You got me! Well done! 😊", 5000);
     rope.stopPulling();
     powerBar.stopIncreasing();
+
+    // Start success particle effect
+    particleSystem.start("success");
     return;
   }
 
@@ -37,6 +40,9 @@ function checkGameConditions() {
     cow.talk("I'm too strong for you! 💪🐄", 5000);
     rope.stopPulling();
     powerBar.stopIncreasing();
+
+    // Start failure particle effect
+    particleSystem.start("failed");
     return;
   }
 }
@@ -207,4 +213,7 @@ function restartGame() {
 
   // Clear smoke effects
   smokes.length = 0;
+
+  // Stop particle system
+  particleSystem.stop();
 }

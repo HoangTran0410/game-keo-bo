@@ -17,6 +17,7 @@ const cowPullImgs = [];
 let hand;
 let rope;
 let powerBar;
+let particleSystem;
 
 const smokes = [];
 
@@ -54,6 +55,7 @@ function setup() {
   rope = new Rope();
   powerBar = new PowerBar();
   powerBar.y = height - 250; // Set position after canvas is created
+  particleSystem = new ParticleSystem();
 
   hand = {
     w: 120,
@@ -124,6 +126,10 @@ function draw() {
   // Draw game result if game is over
   if (gameState === "success" || gameState === "failed") {
     drawGameResult();
+
+    // Only update and draw particle system during game result state
+    particleSystem.update();
+    particleSystem.draw();
   }
 }
 

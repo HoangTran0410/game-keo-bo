@@ -51,6 +51,9 @@ class PowerBar {
       cow.escape();
       rope.reset();
       this.isIncreasing = false;
+
+      // Start failure particle effect
+      particleSystem.start("failed");
     }
   }
 
