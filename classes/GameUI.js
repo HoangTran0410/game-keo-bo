@@ -231,6 +231,5 @@ function restartGame() {
   // Clear smoke effects
   smokes.length = 0;
 
-  // Stop particle system
-  particleSystem.stop();
+  // Note: Particle system will stop automatically when game state changes
 }

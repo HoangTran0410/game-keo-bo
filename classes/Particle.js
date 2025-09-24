@@ -127,6 +127,7 @@ class ParticleSystem {
       "💙",
     ];
     this.currentEmojis = [];
+    this.previousGameState = ""; // Track previous game state to detect changes
 
     // Pre-allocate particle pool to avoid garbage collection
     this.initializePool();
@@ -170,11 +171,8 @@ class ParticleSystem {
 
     let currentTime = millis();
 
-    // Continue spawning particles for a duration
-    if (
-      currentTime - this.startTime < this.spawnDuration &&
-      this.activeCount < this.maxParticles
-    ) {
+    // Continue spawning particles indefinitely while active
+    if (this.activeCount < this.maxParticles) {
       if (this.gameResult === "success") {
         if (currentTime - this.lastSpawnTime > 400) {
           this.createBurst(
@@ -203,13 +201,21 @@ class ParticleSystem {
       }
     }
 
-    // Stop system when no particles left and spawn time is over
+    // Note: Removed automatic stopping - system now runs until explicitly stopped
+  }
+
+  // Method to check and handle game state changes
+  checkGameStateChange(currentGameState) {
+    // Stop particles when transitioning from success/failed to any other state
     if (
-      this.activeCount === 0 &&
-      currentTime - this.startTime > this.spawnDuration
+      (this.previousGameState === "success" ||
+        this.previousGameState === "failed") &&
+      currentGameState !== "success" &&
+      currentGameState !== "failed"
     ) {
-      this.isActive = false;
+      this.stop();
     }
+    this.previousGameState = currentGameState;
   }
 
   createBurst(x, y, count) {

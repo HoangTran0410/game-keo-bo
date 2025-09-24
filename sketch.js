@@ -298,6 +298,9 @@ function draw() {
   // Draw instructions
   drawInstructions();
 
+  // Check for game state changes and handle particle system accordingly
+  particleSystem.checkGameStateChange(gameState);
+
   // Draw game result if game is over
   if (gameState === "success" || gameState === "failed") {
     drawGameResult();
