@@ -1,15 +1,18 @@
 class Cow {
   constructor({
-    img,
-    pullImg,
+    imgs,
+    pullImgs,
     x = 100,
     y = 100,
     size = 150,
     speed = 1,
     level = random([1, 2, 3]),
   }) {
-    this.img = img;
-    this.pullImg = pullImg;
+    this.imgs = imgs;
+    this.pullImgs = pullImgs;
+    this.imgIndex = ~~random(
+      Array.from({ length: this.imgs.length }, (_, i) => i)
+    );
 
     this.x = x;
     this.y = y;
@@ -78,40 +81,46 @@ class Cow {
     // update talk
     this.talkDuration -= 1000 / frameRate();
     if (this.talkDuration <= 0) {
+      let text = "";
+      let duration = 0;
+
       // bị kéo
       if (this.state == "pulling") {
-        this.talk(TEXT_MESSAGES.random(TEXT_MESSAGES.being_pulled));
+        text = random(TEXT_MESSAGES.being_pulled);
+        duration = 2000;
       }
 
       // thành công / thất bại
-      else if (
-        (gameState === "success" || gameState === "failed") &&
-        random() < 0.005
-      ) {
-        this.talk(
-          random(
+      else if (gameState === "success" || gameState === "failed") {
+        if (random() < 0.005) {
+          text = random(
             gameState === "success" ? TEXT_MESSAGES.winner : TEXT_MESSAGES.loser
-          ),
-          1000
-        );
+          );
+          duration = 1000;
+        }
       }
 
       // bò khác đang bị kéo
-      else if (
-        this.state === "running" &&
-        gameState === "pulling" &&
-        random() < 0.0015
-      ) {
-        this.talk(random(TEXT_MESSAGES.cow_cheer), 2000);
+      else if (this.state === "running" && gameState === "pulling") {
+        if (random() < 0.0015) {
+          text = random(TEXT_MESSAGES.cow_cheer);
+          duration = 2000;
+        }
       }
 
       // đang chờ ném
-      else if (this.state === "running" && random() < 0.002) {
-        this.talk(random(TEXT_MESSAGES.waiting_throw), 3000);
+      else if (this.state === "running") {
+        if (random() < 0.002) {
+          text = random(TEXT_MESSAGES.waiting_throw);
+          duration = 3000;
+        }
       }
 
-      // reset
-      else this.talkText = "";
+      if (text && duration) {
+        this.talk(text, duration);
+      } else {
+        this.talkText = "";
+      }
     }
   }
 
@@ -137,18 +146,16 @@ class Cow {
     if (this.flipped) scale(-1, 1);
 
     if (this.state === "running") {
-      image(this.img, -halfSize, -halfSize, realSize, realSize * 0.8);
+      image(this.imgs[this.imgIndex], -halfSize, -halfSize, realSize, realSize);
     } else if (this.state === "pulling") {
-      image(this.pullImg, -halfSize, -halfSize, realSize, realSize);
+      image(
+        this.pullImgs[this.imgIndex],
+        -halfSize,
+        -halfSize,
+        realSize,
+        realSize
+      );
     }
-    pop();
-
-    // draw level
-    push();
-    translate(0, -halfSize);
-    fill(255);
-    textSize(25);
-    text(this.level, 0, 0);
     pop();
 
     // draw talk
@@ -162,15 +169,26 @@ class Cow {
       stroke(255);
       fill(255, 255, 255, 200);
       ellipse(0, 0, w, 40);
-      ellipse(w * 0.25, 25, 10, 10);
-      ellipse(w * 0.2, 20, 15, 15);
+      // ellipse(w * 0.25, 25, 10, 10);
+      // ellipse(w * 0.2, 20, 15, 15);
 
       fill(0);
       textSize(19);
-      textAlign(CENTER, CENTER);
       text(this.talkText, 0, 0);
       pop();
     }
+
+    // draw level
+    push();
+    translate(0, -halfSize);
+    fill(255, 150);
+    noStroke();
+    ellipse(0, 0, 30, 30);
+
+    fill(30);
+    textSize(25);
+    text(this.level, 0, 0);
+    pop();
 
     pop();
   }
@@ -195,5 +213,8 @@ class Cow {
     this.y = getRandomY(this.level);
     this.talkText = "";
     this.level = random([1, 2, 3]);
+    this.imgIndex = ~~random(
+      Array.from({ length: this.imgs.length }, (_, i) => i)
+    );
   }
 }

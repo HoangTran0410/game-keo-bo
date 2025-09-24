@@ -19,12 +19,11 @@ function drawGameResult() {
   } else {
     fill(100, 0, 0, 150); // Dark red for failure
   }
-  rect(boxX, boxY, boxWidth, boxHeight, 20);
+  rect(boxX + boxWidth / 2, boxY + boxHeight / 2, boxWidth, boxHeight, 20);
 
   // Main message
   fill(255);
   noStroke();
-  textAlign(CENTER, CENTER);
   textSize(32);
   textStyle(BOLD);
   text(gameResult.message, width / 2, boxY + 60);
@@ -102,7 +101,6 @@ function drawEnterButtonAnimation() {
   let bounceOffset = sin(pulseTime) * 12; // More bounce
   let alphaValue = map(sin(pulseTime * 3), -1, 1, 180, 255); // Faster flashing
 
-  textAlign(CENTER, CENTER);
   textStyle(BOLD);
 
   // Draw "ENTER" text with pulsing effect
@@ -167,11 +165,9 @@ function drawInstructions() {
   noStroke();
 
   if (gameState === "running") {
-    textAlign(CENTER, CENTER);
     textSize(16);
-    text("Bấm ENTER để ném sợi dây và bắt bò!", width / 2, 30);
+    text("Bấm ENTER để ném sợi dây và bắt Moni!", width / 2, 30);
   } else if (gameState === "pulling") {
-    textAlign(CENTER, CENTER);
     if (rope.attachedCow) {
       let cowLevel = rope.attachedCow.level;
       textSize(40);

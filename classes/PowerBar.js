@@ -89,7 +89,7 @@ class PowerBar {
       gameState = "success";
       gameResult.outcome = "success";
       gameResult.message = "🎉 THÀNH CÔNG! 🎉";
-      gameResult.detailMessage = `Bạn đã bắt được bò Level ${
+      gameResult.detailMessage = `Bạn đã bắt được Moni Level ${
         cow.level
       }!\n${random(TEXT_MESSAGES.winner)}`;
       cow.talk(random(TEXT_MESSAGES.winner), 5000);
@@ -109,7 +109,7 @@ class PowerBar {
       gameState = "failed";
       gameResult.outcome = "failed";
       gameResult.message = "💔 THẤT BẠI! 💔";
-      gameResult.detailMessage = `Bò Level ${cow.level} quá mạnh!\n${random(
+      gameResult.detailMessage = `Moni Level ${cow.level} quá mạnh!\n${random(
         TEXT_MESSAGES.loser
       )}`;
       cow.talk(random(TEXT_MESSAGES.loser), 5000);
@@ -132,7 +132,12 @@ class PowerBar {
     stroke(0);
     strokeWeight(2);
     fill(100, 100, 100, 150);
-    rect(this.x, this.y, this.width, this.height);
+    rect(
+      this.x + this.width / 2,
+      this.y + this.height / 2,
+      this.width,
+      this.height
+    );
 
     // Draw power level
     let powerHeight = map(this.currentPower, 0, this.maxPower, 0, this.height);
@@ -147,7 +152,12 @@ class PowerBar {
     }
 
     noStroke();
-    rect(this.x, this.y + this.height - powerHeight, this.width, powerHeight);
+    rect(
+      this.x + this.width / 2,
+      this.y + this.height - powerHeight / 2,
+      this.width,
+      powerHeight
+    );
 
     // Draw center line
     stroke(255);
@@ -164,7 +174,6 @@ class PowerBar {
     // Label
     fill(255);
     noStroke();
-    textAlign(CENTER, CENTER);
     textSize(12);
     text("POWER", this.x + this.width / 2, this.y - 20);
 

@@ -9,18 +9,21 @@ let backgroundImg;
 let handImg;
 let handPullImg;
 let enterImg;
+let bgMusic;
 let lastGameResultTime = 0;
 
-const cowCount = 3;
+const cowCount = 5;
 const cows = [];
 const cowImgs = [];
 const cowPullImgs = [];
 let lastWinCowLevel = null;
 
 // based on cow level
+// let cow3LoseCount = 0;
+// const autoWinCow3AfterLoseCount = 5;
 const winPercentage = [0.9, 0.7, 0.6];
 const winLimit = [70, 20, 10];
-const decreaseSpeed = [0.2, 0.3, 0.5];
+const decreaseSpeed = [0.25, 0.3, 0.4];
 const winHistory = [
   // {
   //   name: 'user',
@@ -63,7 +66,7 @@ const TEXT_MESSAGES = {
   },
   loser: [
     "🐌 Chậm như rùa!",
-    "💨 Bò còn nhanh hơn bạn",
+    "💨 Moni nhanh hơn bạn",
     "🪦 Thua rồi kìa lêu lêu",
     "😹 Ez game, noob",
     "🧊 Đơ luôn kìa",
@@ -73,12 +76,12 @@ const TEXT_MESSAGES = {
     "🍌 Banana skill?",
     "💤 Ngủ quên à?",
     "🤣 Ôi trời ơi",
-    "🐂 Bò còn cười bạn",
+    "🐂 Hú hú khẹc khẹc",
     "📉 Skill tụt dốc",
-    "🥱 Chán ghê",
+    "🥱 Chán dị",
     "🤖 Bot mode on?",
     "👶 Baby level",
-    "📴 Disconnect não?",
+    "📴 Ối giời ơi",
     "🪫 Hết pin à?",
   ],
   winner: [
@@ -88,7 +91,7 @@ const TEXT_MESSAGES = {
     "🤣 Quá nhanh quá nguy hiểm",
     "🚀 Tốc độ bàn thờ",
     "🍗 Ăn gọn gàng",
-    "🐂 Bò cũng phải nể",
+    "🐂 Moni cũng phải nể",
     "⚡ Boom! Done",
     "🥇 Top 1 server",
     "🎯 Chuẩn không cần chỉnh",
@@ -105,7 +108,7 @@ const TEXT_MESSAGES = {
   being_pulled: [
     "🫣 Ơ kìa, từ từ đã!",
     "😵 Kéo nhẹ thôi chứ!",
-    "😂 Bò ơi cứu tao!",
+    "😂 Ae ơi cứu tui!",
     "🤔 Hình như dây này fake?",
     "🙃 Thôi xong...",
     "🦴 Kéo gãy xương rồi 😭",
@@ -115,12 +118,11 @@ const TEXT_MESSAGES = {
     "😹 Đừng kéo tóc tui chứ!",
     "💨 Bayyy luôn rồi",
     "🥴 Tạm biệt các bạn",
-    "📉 Skill tụt dốc không phanh",
     "🥹 Tha cho tui phát này đi",
     "🤣 Ôi trời, mất lực bám rồi",
     "🤮 Gồng hết nổi huhu",
     "😵‍💫 Chóng mặt quá",
-    "💤 Kéo kiểu này thì ngủ luôn",
+    "💤 Kéo kiểu này chớt tui",
     "🤲 Cho tui cơ hội làm lại",
   ],
   throw_failed: [
@@ -128,40 +130,34 @@ const TEXT_MESSAGES = {
     "🤡 Ném mà trượt luôn!",
     "🤣 Hụt rồi bạn ơi!",
     "🥴 Tay run hả?",
-    "📉 Accuracy = 0%",
     "🫠 Ném còn sai thì thôi",
-    "🤲 Ném như chưa từng ném",
+    "🤲 Ném như chưa ném",
     "😵 Lệch hẳn một mét!",
-    "🙄 Chơi ném vòng sang nhà hàng xóm?",
-    "🪃 Boomerang còn quay lại, dây thì không",
     "😏 Xem lại tầm mắt đi bạn",
-    "🐌 Chậm còn hơn cả bò",
     "📦 Ship sai địa chỉ rồi",
     "🎯 Mục tiêu còn ở xa lắm!",
     "🕳️ Ném thẳng xuống hố à?",
-    "🫢 Tự hại chính mình luôn",
     "🔥 Cú ném tệ nhất năm",
   ],
   waiting_throw: [
     "🙄 Còn chờ gì nữa?",
     "😏 Run tay à?",
-    "😂 Đứng ngắm bò thôi hả?",
-    "🤡 Định câu cá hay sao?",
-    "🥱 Nhanh đi ngủ tới nơi",
-    "📉 Delay mất rank rồi",
-    "🫢 Bò sắp chạy mất kìa",
+    "😂 Đứng ngắm thôi hả?",
+    "🥱 Ném nhanh mình còn đi",
+    "📉 Delay ném như delay task",
+    "🫢 Moni sắp chạy mất kìa",
     "🤣 Cứ đứng vậy thì auto thua",
-    "😹 Đang tính toán vũ trụ?",
+    "😹 Đang tính toán gì thế?",
     "🔥 Khịa nhiều hơn ném",
     "🤔 Đợi thần linh nhập à?",
     "😵 Xong, não lag rồi",
     "🙃 AFK thì nói 1 tiếng",
-    "🪀 Quay dây chơi thôi hả?",
+    "🪀 Đứng đó chơi thôi hả?",
     "🕰️ Đồng hồ kêu kìa!",
     "🚶‍♂️ Chờ tới mùa quýt?",
     "🎯 Mục tiêu còn đang đợi kìa",
     "😴 Ném trong mơ hả?",
-    "😏 Bò kéo hộ cho nhanh",
+    "😏 Để tui ném cho nhanh",
     "💀 Đứng thêm tí nữa thành tượng đá",
   ],
   cow_cheer: [
@@ -171,15 +167,15 @@ const TEXT_MESSAGES = {
     "💪 Gồng nữa đi!",
     "😭 Đừng bỏ cuộc!",
     "🤲 Ai đó cứu với!",
-    "🙀 Bò nhà mình sắp toang!",
+    "🙀 Moni nhà mình sắp toang!",
     "🔥 Đứng dậy, phản công!",
     "🐮 Tin ở bạn!",
     "🫨 Kéo lại lẹ lên!",
-    "📣 Bò ơi cố tí nữa!",
-    "🤣 Đừng để mất mặt đàn bò!",
+    "📣 Moni ơi cố tí nữa!",
+    "🤣 Đừng để mất mặt đàn moni!",
     "😵 Ê, sắp bay rồi kìa!",
     "👀 Tất cả đang nhìn bạn đó!",
-    "😤 Thua thì đừng về chuồng!",
+    "😤 Thua thì đừng về phòng!",
     "🍀 Niềm tin cuối cùng!",
     "🥵 Mồ hôi rơi như mưa!",
     "📢 Trọng tài, cứu nó đi!",
@@ -192,7 +188,6 @@ const TEXT_MESSAGES = {
     "🚨 Báo động đỏ, kéo mạnh lên!",
     "😬 Không ổn rồi!",
     "🥶 Lạnh sống lưng quá!",
-    "🤡 Đừng xấu hổ trước đàn bò!",
     "🥳 Lật kèo đi chứ!",
     "💀 Gãy giò thì khổ!",
   ],
@@ -203,6 +198,7 @@ function preload() {
   handImg = loadImage(`assets/hand.png`);
   handPullImg = loadImage(`assets/hand_pull.png`);
   enterImg = loadImage(`assets/enter.png`);
+  bgMusic = loadSound(`assets/AdhesiveWombat - 8 Bit Adventure (1).mp3`);
 
   for (let i = 1; i < cowCount + 1; i++) {
     cowImgs.push(loadImage(`assets/cow${i}.png`));
@@ -225,6 +221,9 @@ function setup() {
   const maxHeight = windowHeight - 50;
   createCanvas(maxHeight * (4 / 3), maxHeight);
 
+  rectMode(CENTER);
+  textAlign(CENTER, CENTER);
+
   rope = new Rope();
   powerBar = new PowerBar();
   powerBar.y = height - 250; // Set position after canvas is created
@@ -242,8 +241,8 @@ function setup() {
     const level = random([1, 2, 3]);
     cows.push(
       new Cow({
-        img: cowImgs[currentCowId],
-        pullImg: cowPullImgs[currentCowId],
+        imgs: cowImgs,
+        pullImgs: cowPullImgs,
         x: 50 + i * 150,
         y: getRandomY(level),
         level: level,
@@ -255,6 +254,8 @@ function setup() {
       currentCowId = 0;
     }
   }
+
+  bgMusic.loop();
 }
 
 function draw() {
@@ -272,12 +273,12 @@ function draw() {
     }
   }
 
-  cows.forEach((cow) => cow.update());
-  cows.forEach((cow) => cow.draw());
-
   // Update and draw rope
   rope.update();
   rope.draw();
+
+  cows.forEach((cow) => cow.update());
+  cows.forEach((cow) => cow.draw());
 
   // Update and draw power bar
   powerBar.update();
