@@ -35,16 +35,6 @@ class Cow {
   update() {
     if (this.state === "running") {
       this.x += this.speed;
-
-      if (this.x > width) {
-        // this.x = -this.size - random(100, 200);
-        // this.y = getRandomY(this.level);
-        // // reset state
-        // this.state = "running";
-        // this.speed = this.originalSpeed;
-        this.resetPosition();
-      }
-
       this.flipped = false;
     }
     if (this.state === "pulling") {
@@ -60,11 +50,6 @@ class Cow {
       // Move quickly in escape direction
       this.x += this.escapeSpeed * this.escapeDirection;
       this.y += random(-1, 1); // Slight random movement
-
-      // Remove cow when it goes off screen
-      if (this.x > width + 100 || this.x < -this.size - 100) {
-        this.resetPosition();
-      }
     }
 
     // add smoke
@@ -122,6 +107,15 @@ class Cow {
       } else {
         this.talkText = "";
       }
+    }
+
+    if (this.x > width) {
+      // this.x = -this.size - random(100, 200);
+      // this.y = getRandomY(this.level);
+      // // reset state
+      // this.state = "running";
+      // this.speed = this.originalSpeed;
+      this.resetPosition();
     }
   }
 

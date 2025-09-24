@@ -35,7 +35,7 @@ class PowerBar {
           const id = level - 1;
           const percent = winPercentage[id];
 
-          console.log(rand, percent);
+          console.log(rand, percent, level, rope.attachedCow);
 
           console.log(
             level,

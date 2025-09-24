@@ -1,3 +1,4 @@
+let gameStarted = false;
 let gameState = "running"; // running, pulling, success, failed
 let gameResult = {
   outcome: "",
@@ -24,7 +25,7 @@ const autoWinCow3AfterLoseCount = 4;
 const winPercentage = [0.9, 0.7, 0.6];
 const winLimit = [70, 20, 10];
 const pullTime = [3, 5, 7];
-const decreaseSpeed = [0.25, 0.3, 0.36];
+const decreaseSpeed = [0.3, 0.3, 0.36];
 const winHistory = [
   // {
   //   name: 'user',
@@ -259,12 +260,17 @@ function setup() {
       currentCowId = 0;
     }
   }
-
-  bgMusic.loop();
 }
 
 function draw() {
   background(backgroundImg);
+
+  if (!gameStarted) {
+    textSize(40);
+    fill(255, 255, 255, 200);
+    text("Bấm ENTER để bắt đầu", width / 2, height / 2);
+    return;
+  }
 
   // sort cows by y
   cows.sort((a, b) => a.y - b.y);
@@ -336,7 +342,10 @@ function drawHand() {
 
 function keyPressed() {
   if (key === "Enter" || keyCode === ENTER) {
-    if (gameState === "running" && !rope.isActive) {
+    if (!gameStarted) {
+      gameStarted = true;
+      bgMusic.loop();
+    } else if (gameState === "running" && !rope.isActive) {
       // Throw rope vertically to center of screen from very bottom
       let handCenterX = hand.x + hand.w / 2;
       let ropeStartY = height - 10; // Very bottom of screen

@@ -135,6 +135,7 @@ class Rope {
       if (cow.state === "running" && cow.isCollide(this.endX, this.endY, 10)) {
         // Rope hit a cow
         this.attachedCow = cow;
+        console.log("attachedCow", cow);
         cow.state = "pulling";
         cows.forEach((c) => {
           cow.talkDuration = 0; // reset talk
@@ -213,7 +214,7 @@ class Rope {
     this.isPulling = false;
     this.cowPullDistance = 0;
     if (this.attachedCow) {
-      this.attachedCow.state = "running";
+      // this.attachedCow.state = "running";
       this.attachedCow = null;
     }
   }
