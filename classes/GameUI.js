@@ -51,6 +51,7 @@ function drawGameResult() {
     boxY + boxHeight - 40
   );
   if (gameResult.outcome === "success") {
+    fill(255, 200, 0, 200);
     text("Bấm S để lưu kết quả!", width / 2, boxY + boxHeight - 20);
   }
 
@@ -60,30 +61,55 @@ function drawGameResult() {
 }
 
 function drawSaveResult() {
-  const best5Result = winHistory.sort((a, b) => b.level - a.level).slice(0, 5);
-  if (!best5Result.length) return;
+  const allUserName = new Set(winHistory.map((item) => item.name));
+  if (allUserName.size === 0) return;
 
-  // draw list win history at bottom right corner
-  push();
-  fill(255, 255, 255, 200);
-  noStroke();
-  textAlign(RIGHT, BOTTOM);
-  textSize(16);
-
-  // draw list win history
-  let y = height - 20;
-  for (let i = 0; i < best5Result.length; i++) {
-    text(
-      best5Result[i].name + " - Level " + best5Result[i].level,
-      width - 20,
-      y
-    );
-    y -= 20;
+  // calculate score for each user, based on level
+  const scoreMap = new Map();
+  for (let item of winHistory) {
+    if (!scoreMap.has(item.name)) {
+      scoreMap.set(item.name, 0);
+    }
+    scoreMap.set(item.name, scoreMap.get(item.name) + item.level);
   }
 
-  text("Kết quả", width - 20, y);
+  // sort by score
+  const scoreList = Array.from(scoreMap.entries())
+    .sort((a, b) => b[1] - a[1])
+    .map((item) => ({
+      name: item[0],
+      score: item[1],
+    }));
+  const best5Result = scoreList.slice(0, 5);
 
-  pop();
+  const p = document.getElementById("history");
+  p.innerHTML = "🌟 Bảng vàng 🌟" + "<br>";
+  for (let i = 0; i < best5Result.length; i++) {
+    p.innerHTML +=
+      best5Result[i].name + " - " + best5Result[i].score + " điểm" + "<br>";
+  }
+
+  // draw list win history at bottom right corner
+  // push();
+  // fill(255, 255, 255, 200);
+  // noStroke();
+  // textAlign(RIGHT, BOTTOM);
+  // textSize(16);
+
+  // // draw list win history
+  // let y = height - 20;
+  // for (let i = 0; i < best5Result.length; i++) {
+  //   text(
+  //     best5Result[i].name + " - " + best5Result[i].score + " điểm",
+  //     width - 20,
+  //     y
+  //   );
+  //   y -= 20;
+  // }
+
+  // text("Kết quả", width - 20, y);
+
+  // pop();
 }
 
 function drawEnterButtonAnimation() {

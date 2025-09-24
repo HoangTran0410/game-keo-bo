@@ -10,7 +10,7 @@ class Cow {
   }) {
     this.imgs = imgs;
     this.pullImgs = pullImgs;
-    this.imgIndex = ~~random(
+    this.imgIndex = random(
       Array.from({ length: this.imgs.length }, (_, i) => i)
     );
 
@@ -37,11 +37,12 @@ class Cow {
       this.x += this.speed;
 
       if (this.x > width) {
-        this.x = -this.size - random(100, 200);
-        this.y = getRandomY(this.level);
-        // reset state
-        this.state = "running";
-        this.speed = this.originalSpeed;
+        // this.x = -this.size - random(100, 200);
+        // this.y = getRandomY(this.level);
+        // // reset state
+        // this.state = "running";
+        // this.speed = this.originalSpeed;
+        this.resetPosition();
       }
 
       this.flipped = false;
@@ -71,7 +72,7 @@ class Cow {
       smokes.push(
         new Smoke(
           this.x + this.size / 3,
-          this.y + this.size / 1.5,
+          this.y + this.size,
           1000,
           random(1, 5)
         )
@@ -128,13 +129,14 @@ class Cow {
     const realSize = this.size * getPerspectiveScale(this.y);
     const realX = this.x + realSize / 2;
     const realY = this.y + realSize / 2;
-    const realR = realSize / 2;
+    const realR = realSize / 2.5;
 
     return dist(x, y, realX, realY) < realR + r;
   }
 
   draw() {
     const realSize = this.size * getPerspectiveScale(this.y);
+
     push();
     translate(this.x + realSize / 2, this.y + realSize / 2);
 
@@ -191,6 +193,17 @@ class Cow {
     pop();
 
     pop();
+
+    // debug collide edge
+    // const realX = this.x + realSize / 2;
+    // const realY = this.y + realSize / 2;
+    // const realR = realSize / 2.5;
+    // push();
+    // stroke(255, 0, 0);
+    // strokeWeight(2);
+    // noFill();
+    // ellipse(realX, realY, realR * 2, realR * 2);
+    // pop();
   }
 
   talk(text, duration = 1000) {
@@ -213,7 +226,7 @@ class Cow {
     this.y = getRandomY(this.level);
     this.talkText = "";
     this.level = random([1, 2, 3]);
-    this.imgIndex = ~~random(
+    this.imgIndex = random(
       Array.from({ length: this.imgs.length }, (_, i) => i)
     );
   }

@@ -19,11 +19,12 @@ const cowPullImgs = [];
 let lastWinCowLevel = null;
 
 // based on cow level
-// let cow3LoseCount = 0;
-// const autoWinCow3AfterLoseCount = 5;
+let cow3LoseCount = 0;
+const autoWinCow3AfterLoseCount = 4;
 const winPercentage = [0.9, 0.7, 0.6];
 const winLimit = [70, 20, 10];
-const decreaseSpeed = [0.25, 0.3, 0.4];
+const pullTime = [3, 5, 7];
+const decreaseSpeed = [0.25, 0.3, 0.36];
 const winHistory = [
   // {
   //   name: 'user',
@@ -48,9 +49,12 @@ function loadHistory() {
   } catch (error) {
     console.error(error);
   }
+
+  drawSaveResult();
 }
 function saveHistory() {
   localStorage.setItem("gameKeyBo", JSON.stringify(winHistory));
+  drawSaveResult();
 }
 
 let hand;
@@ -200,7 +204,7 @@ function preload() {
   enterImg = loadImage(`assets/enter.png`);
   bgMusic = loadSound(`assets/AdhesiveWombat - 8 Bit Adventure (1).mp3`);
 
-  for (let i = 1; i < cowCount + 1; i++) {
+  for (let i = 1; i <= cowCount; i++) {
     cowImgs.push(loadImage(`assets/cow${i}.png`));
     cowPullImgs.push(loadImage(`assets/cow${i}_pull.png`));
   }
@@ -219,7 +223,8 @@ function setup() {
   loadHistory();
 
   const maxHeight = windowHeight - 50;
-  createCanvas(maxHeight * (4 / 3), maxHeight);
+  let canvas = createCanvas(maxHeight * (4 / 3), maxHeight);
+  canvas.parent("#game-container");
 
   rectMode(CENTER);
   textAlign(CENTER, CENTER);
@@ -302,7 +307,7 @@ function draw() {
     particleSystem.draw();
   }
 
-  drawSaveResult();
+  // drawSaveResult();
 }
 
 function drawHand() {

@@ -31,13 +31,27 @@ class PowerBar {
         // Check win condition: time reached 0 and power > 0
         if (this.remainingTime <= 0 && this.currentPower > 0) {
           const rand = random();
-          const id = rope.attachedCow.level - 1;
+          const level = rope.attachedCow.level;
+          const id = level - 1;
           const percent = winPercentage[id];
 
           console.log(rand, percent);
-          if (rand < percent && !reachLimit(rope.attachedCow.level)) {
+
+          console.log(
+            level,
+            "cow3LoseCount",
+            cow3LoseCount,
+            "autoWinCow3AfterLoseCount",
+            autoWinCow3AfterLoseCount
+          );
+          if (
+            (level === 3 && cow3LoseCount >= autoWinCow3AfterLoseCount) ||
+            (rand < percent && !reachLimit(level))
+          ) {
+            if (level === 3) cow3LoseCount = 0; // reset lose count
             this.onWin();
           } else {
+            if (level === 3) cow3LoseCount++;
             this.onLose();
           }
           lastGameResultTime = millis();
@@ -45,7 +59,7 @@ class PowerBar {
         }
 
         // Check lose condition: power reached 0 before time runs out
-        if (this.currentPower <= 10) {
+        if (this.currentPower <= 5) {
           this.onLose();
           lastGameResultTime = millis();
           return;
@@ -65,7 +79,7 @@ class PowerBar {
   }
 
   startTimer(cowLevel) {
-    this.maxTime = cowLevel * 3000; // 3 seconds per level in milliseconds
+    this.maxTime = pullTime[cowLevel - 1] * 1000;
     this.remainingTime = this.maxTime;
     this.timerActive = true;
 
@@ -175,7 +189,7 @@ class PowerBar {
     fill(255);
     noStroke();
     textSize(12);
-    text("POWER", this.x + this.width / 2, this.y - 20);
+    text("SỨC MẠNH", this.x + this.width / 2, this.y - 20);
 
     // Timer display
     // if (this.timerActive) {

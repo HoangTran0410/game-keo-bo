@@ -12,7 +12,28 @@ body {
   background-color: #222;
 }
 
+#game-container {
+  position: relative;
+}
+
 canvas {
   display: block;
   border-radius: 20px;
+}
+
+#history {
+  color: #fff;
+  position: absolute;
+  display: block;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: right;
+  font-size: 16px;
+  font-weight: bold;
+  z-index: 1000;
+  padding: 10px;
+  opacity: 0.8;
+
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
