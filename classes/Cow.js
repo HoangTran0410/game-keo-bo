@@ -19,7 +19,7 @@ class Cow {
     this.size = size;
     this.speed = speed;
     this.level = level;
-    this.state = "running"; // running, pulling, escaping, success, failed
+    this.state = "running"; // running, pulling, escaping
 
     this.talkText = "";
     this.talkDuration = 0;
@@ -49,7 +49,8 @@ class Cow {
     if (this.state === "escaping") {
       // Move quickly in escape direction
       this.x += this.escapeSpeed * this.escapeDirection;
-      this.y += random(-1, 1); // Slight random movement
+      this.y += random(-2, 2); // Slight random movement
+      this.flipped = false;
     }
 
     // add smoke
@@ -141,9 +142,7 @@ class Cow {
     const halfSize = realSize / 2;
     if (this.flipped) scale(-1, 1);
 
-    if (this.state === "running") {
-      image(this.imgs[this.imgIndex], -halfSize, -halfSize, realSize, realSize);
-    } else if (this.state === "pulling") {
+    if (this.state === "pulling") {
       image(
         this.pullImgs[this.imgIndex],
         -halfSize,
@@ -151,6 +150,8 @@ class Cow {
         realSize,
         realSize
       );
+    } else {
+      image(this.imgs[this.imgIndex], -halfSize, -halfSize, realSize, realSize);
     }
     pop();
 
@@ -209,8 +210,8 @@ class Cow {
     this.state = "escaping";
     this.speed = this.escapeSpeed;
     // Determine escape direction based on current position
-    this.escapeDirection = this.x < width / 2 ? -1 : 1;
-    this.talk(random(TEXT_MESSAGES.loser), 2000);
+    // this.escapeDirection = this.x < width / 2 ? -1 : 1;
+    // this.talk(random(TEXT_MESSAGES.loser), 2000);
   }
 
   resetPosition() {

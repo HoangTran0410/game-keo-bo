@@ -60,11 +60,9 @@ class Rope {
         }
 
         // tất cả bò cười vào mặt bạn
-        // chọn 3 bò ngẫu nhiên
-        const selectedCows = cows.sort(() => Math.random() - 0.5).slice(0, 3);
-        selectedCows.forEach((cow) => {
-          if (random() < 0.3) {
-            cow.talk(random(TEXT_MESSAGES.throw_failed), 3000);
+        cows.forEach((cow) => {
+          if (random() < 0.9) {
+            cow.talk(random(TEXT_MESSAGES.throw_failed), random(2000, 4000));
           }
         });
       }
