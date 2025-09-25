@@ -25,7 +25,7 @@ const autoWinCow3AfterLoseCount = 4;
 const winPercentage = [0.9, 0.7, 0.6];
 const winLimit = [70, 20, 10];
 const pullTime = [3, 5, 7];
-const decreaseSpeed = [0.3, 0.3, 0.36];
+const decreaseSpeed = [0.3, 0.32, 0.36];
 const winHistory = [
   // {
   //   name: 'user',
@@ -341,7 +341,7 @@ function drawHand() {
 }
 
 function keyPressed() {
-  if (key === "Enter" || keyCode === ENTER) {
+  if (key === "Enter" || keyCode === ENTER || keyCode == SHIFT) {
     if (!gameStarted) {
       gameStarted = true;
       bgMusic.loop();
