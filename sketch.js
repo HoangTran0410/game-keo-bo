@@ -21,11 +21,11 @@ let lastWinCowLevel = null;
 
 // based on cow level
 let cow3LoseCount = 0;
-const autoWinCow3AfterLoseCount = 4;
+const autoWinCow3AfterLoseCount = 5;
 const winPercentage = [0.9, 0.7, 0.4];
 const winLimit = [70, 20, 10];
 const pullTime = [3, 5, 7];
-const decreaseSpeed = [0.3, 0.32, 0.365];
+const decreaseSpeed = [0.3, 0.34, 0.38];
 const winHistory = [
   // {
   //   name: 'user',
